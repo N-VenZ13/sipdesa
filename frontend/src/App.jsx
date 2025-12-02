@@ -13,6 +13,7 @@ import DashboardUser from './pages/user/DashboardUser';
 import AjukanSurat from './pages/user/AjukanSurat'; 
 import UserPengaduan from './pages/user/UserPengaduan';
 import AdminPengaduan from './pages/admin/AdminPengaduan';
+import ManajemenUser from './pages/admin/ManajemenUser';
 
 
 
@@ -29,11 +30,12 @@ function App() {
           <Route path="informasi" element={<InformasiPublik />} />
           <Route path="surat" element={<ManajemenSurat />} />
           <Route path="pengaduan" element={<AdminPengaduan />} />
+          <Route path="users" element={<ManajemenUser />} />
           
           {/* Nanti kita tambah halaman lain disini */}
 
           {/* <Route path="pengaduan" element={<div>Halaman Pengaduan (Coming Soon)</div>} /> */}
-          <Route path="users" element={<div>Halaman Users (Coming Soon)</div>} />
+          {/* <Route path="users" element={<div>Halaman Users (Coming Soon)</div>} /> */}
         </Route>
 
         {/* Route Khusus User Biasa (Protected) */}

@@ -89,9 +89,9 @@ const LoginPage = () => {
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
+        {/* <p className="mt-4 text-center text-sm text-gray-600">
           Belum punya akun? <span className="text-blue-500 cursor-pointer font-bold">Daftar disini</span>
-        </p>
+        </p> */}
       </div>
     </div>
   );
