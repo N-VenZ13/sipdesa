@@ -8,6 +8,9 @@ import AdminLayout from './layouts/AdminLayout';
 import DashboardAdmin from './pages/admin/DashboardAdmin';
 import InformasiPublik from './pages/admin/InformasiPublik';
 import ManajemenSurat from './pages/admin/ManajemenSurat';
+import UserLayout from './layouts/UserLayout'; 
+import DashboardUser from './pages/user/DashboardUser';  
+import AjukanSurat from './pages/user/AjukanSurat'; 
 
 function App() {
   return (
@@ -23,9 +26,15 @@ function App() {
           <Route path="surat" element={<ManajemenSurat />} />
           
           {/* Nanti kita tambah halaman lain disini */}
-          
+
           <Route path="pengaduan" element={<div>Halaman Pengaduan (Coming Soon)</div>} />
           <Route path="users" element={<div>Halaman Users (Coming Soon)</div>} />
+        </Route>
+
+        {/* Route Khusus User Biasa (Protected) */}
+        <Route path="/user" element={<UserLayout />}>
+          <Route path="dashboard" element={<DashboardUser />} />
+          <Route path="ajukan" element={<AjukanSurat />} />
         </Route>
 
         {/* Redirect Default */}
