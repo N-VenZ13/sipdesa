@@ -11,6 +11,10 @@ import ManajemenSurat from './pages/admin/ManajemenSurat';
 import UserLayout from './layouts/UserLayout'; 
 import DashboardUser from './pages/user/DashboardUser';  
 import AjukanSurat from './pages/user/AjukanSurat'; 
+import UserPengaduan from './pages/user/UserPengaduan';
+import AdminPengaduan from './pages/admin/AdminPengaduan';
+
+
 
 function App() {
   return (
@@ -24,10 +28,11 @@ function App() {
           <Route path="dashboard" element={<DashboardAdmin />} />
           <Route path="informasi" element={<InformasiPublik />} />
           <Route path="surat" element={<ManajemenSurat />} />
+          <Route path="pengaduan" element={<AdminPengaduan />} />
           
           {/* Nanti kita tambah halaman lain disini */}
 
-          <Route path="pengaduan" element={<div>Halaman Pengaduan (Coming Soon)</div>} />
+          {/* <Route path="pengaduan" element={<div>Halaman Pengaduan (Coming Soon)</div>} /> */}
           <Route path="users" element={<div>Halaman Users (Coming Soon)</div>} />
         </Route>
 
@@ -35,6 +40,7 @@ function App() {
         <Route path="/user" element={<UserLayout />}>
           <Route path="dashboard" element={<DashboardUser />} />
           <Route path="ajukan" element={<AjukanSurat />} />
+          <Route path="pengaduan" element={<UserPengaduan />} />
         </Route>
 
         {/* Redirect Default */}

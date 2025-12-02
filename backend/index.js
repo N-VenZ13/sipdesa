@@ -12,6 +12,7 @@ const path = require('path');
 const authRoutes = require('./src/routes/authRoutes');
 const informasiRoutes = require('./src/routes/informasiRoutes');
 const suratRoutes = require('./src/routes/suratRoutes');
+const pengaduanRoutes = require('./src/routes/pengaduanRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -32,6 +33,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRoutes);
 app.use('/api/informasi', informasiRoutes);
 app.use('/api/surat', suratRoutes);
+app.use('/api/pengaduan', pengaduanRoutes);
 
 // Test Route
 app.get('/', (req, res) => {

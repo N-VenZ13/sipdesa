@@ -25,6 +25,7 @@ const UserLayout = () => {
           <div className="flex items-center gap-6">
             <Link to="/user/dashboard" className="hover:text-blue-200">Beranda</Link>
             <Link to="/user/ajukan" className="hover:text-blue-200">Ajukan Surat</Link>
+            <Link to="/user/pengaduan" className="hover:text-blue-200">Pengaduan</Link>
             
             <div className="flex items-center gap-3 pl-6 border-l border-blue-400">
               <div className="flex items-center gap-2">
