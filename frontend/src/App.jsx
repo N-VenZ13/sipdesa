@@ -7,6 +7,7 @@ import LoginPage from './pages/auth/LoginPage';
 import AdminLayout from './layouts/AdminLayout';
 import DashboardAdmin from './pages/admin/DashboardAdmin';
 import InformasiPublik from './pages/admin/InformasiPublik';
+import ManajemenSurat from './pages/admin/ManajemenSurat';
 
 function App() {
   return (
@@ -19,9 +20,10 @@ function App() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<DashboardAdmin />} />
           <Route path="informasi" element={<InformasiPublik />} />
+          <Route path="surat" element={<ManajemenSurat />} />
           
           {/* Nanti kita tambah halaman lain disini */}
-          <Route path="surat" element={<div>Halaman Surat (Coming Soon)</div>} />
+          
           <Route path="pengaduan" element={<div>Halaman Pengaduan (Coming Soon)</div>} />
           <Route path="users" element={<div>Halaman Users (Coming Soon)</div>} />
         </Route>
