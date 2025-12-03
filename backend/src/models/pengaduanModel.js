@@ -12,10 +12,19 @@ const Pengaduan = {
         return result;
     },
 
-    // 2. Ambil Riwayat User (Warga)
+    // 2. Ambil Riwayat User (Warga) - DENGAN RESPON
     findByUserId: async (userId) => {
+        // Kita gunakan Subquery untuk mengambil respon terbaru (jika ada)
         const query = `
-            SELECT * FROM pengaduan 
+            SELECT p.*, 
+            (
+                SELECT respon 
+                FROM tindak_lanjut_pengaduan t 
+                WHERE t.pengaduan_id = p.id 
+                ORDER BY t.tgl_tindak_lanjut DESC 
+                LIMIT 1
+            ) as respon_admin
+            FROM pengaduan p 
             WHERE user_id = ? 
             ORDER BY created_at DESC
         `;

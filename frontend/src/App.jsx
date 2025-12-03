@@ -14,6 +14,7 @@ import AjukanSurat from './pages/user/AjukanSurat';
 import UserPengaduan from './pages/user/UserPengaduan';
 import AdminPengaduan from './pages/admin/AdminPengaduan';
 import ManajemenUser from './pages/admin/ManajemenUser';
+import InfoDesa from './pages/user/InfoDesa';
 
 
 
@@ -43,6 +44,7 @@ function App() {
           <Route path="dashboard" element={<DashboardUser />} />
           <Route path="ajukan" element={<AjukanSurat />} />
           <Route path="pengaduan" element={<UserPengaduan />} />
+          <Route path="info" element={<InfoDesa />} />
         </Route>
 
         {/* Redirect Default */}

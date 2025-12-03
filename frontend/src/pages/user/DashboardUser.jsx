@@ -3,44 +3,88 @@ import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { 
   FaPlus, FaFileAlt, FaCheckCircle, FaClock, FaTimesCircle, 
-  FaBullhorn, FaNewspaper, FaArrowRight, FaUserCircle 
-} from 'react-icons/fa';
+  FaBullhorn, FaNewspaper, FaArrowRight, FaUserCircle, FaCommentDots 
+} from 'react-icons/fa'; 
 import { useSelector } from 'react-redux';
+import Swal from 'sweetalert2'; 
 
 const DashboardUser = () => {
+  // --- STATE ---
   const [riwayat, setRiwayat] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { user } = useSelector((state) => state.auth); // Ambil nama user dari Redux
+  
+  // Ambil data user yang sedang login dari Redux
+  const { user } = useSelector((state) => state.auth);
 
+  // --- FETCH DATA ---
   useEffect(() => {
-    const fetchRiwayat = async () => {
+    const fetchData = async () => {
       try {
-        const response = await api.get('/surat/riwayat');
-        setRiwayat(response.data);
+        // 1. Request data Surat dan Pengaduan secara bersamaan
+        const [resSurat, resAduan] = await Promise.all([
+          api.get('/surat/riwayat'),
+          api.get('/pengaduan/riwayat')
+        ]);
+
+        // 2. Tandai tipe datanya
+        const listSurat = resSurat.data.map(item => ({ ...item, tipe: 'surat' }));
+        const listAduan = resAduan.data.map(item => ({ ...item, tipe: 'aduan' }));
+
+        // 3. Gabungkan dan Urutkan dari yang terbaru
+        const gabungan = [...listSurat, ...listAduan].sort((a, b) => 
+          new Date(b.created_at) - new Date(a.created_at)
+        );
+
+        setRiwayat(gabungan);
       } catch (error) {
         console.error("Gagal load data", error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchRiwayat();
+    fetchData();
   }, []);
 
+  // --- POPUP TANGGAPAN ADMIN ---
+  const showResponAdmin = (pesan, judul) => {
+    Swal.fire({
+      title: 'Tanggapan Admin',
+      html: `
+        <div class="text-left bg-blue-50 p-4 rounded-lg border border-blue-100">
+          <p class="text-xs text-gray-500 mb-2 uppercase font-bold">Perihal Laporan:</p>
+          <p class="text-gray-700 font-semibold mb-4 border-b pb-2">${judul}</p>
+          
+          <p class="text-xs text-gray-500 mb-2 uppercase font-bold">Respon:</p>
+          <p class="text-gray-800 text-lg leading-relaxed">"${pesan}"</p>
+        </div>
+      `,
+      icon: 'info',
+      confirmButtonText: 'Tutup',
+      confirmButtonColor: '#2563eb'
+    });
+  };
+
+  // --- HELPER WARNA STATUS ---
   const getStatusBadge = (status) => {
     const styles = {
+      // Surat
       selesai: 'bg-green-100 text-green-700 border-green-200',
       ditolak: 'bg-red-100 text-red-700 border-red-200',
       diajukan: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-      diproses: 'bg-blue-100 text-blue-700 border-blue-200'
+      diproses: 'bg-blue-100 text-blue-700 border-blue-200',
+      // Pengaduan
+      pending: 'bg-gray-100 text-gray-600 border-gray-200',
+      ditindak: 'bg-blue-100 text-blue-700 border-blue-200',
     };
     
     return (
-      <span className={`px-3 py-1 rounded-full text-xs font-bold border ${styles[status] || 'bg-gray-100'}`}>
-        {status.toUpperCase()}
+      <span className={`px-3 py-1 rounded-full text-xs font-bold border capitalize ${styles[status] || 'bg-gray-100'}`}>
+        {status}
       </span>
     );
   };
 
+  // --- RENDER UI ---
   return (
     <div className="space-y-8">
       
@@ -52,14 +96,14 @@ const DashboardUser = () => {
             Halo, {user?.name || 'Warga'}!
           </h1>
           <p className="text-blue-100 text-lg">
-            Selamat datang di Portal Pelayanan Digital Desa Sukatani. Apa yang bisa kami bantu hari ini?
+            Selamat datang di Portal Pelayanan Digital Desa.
           </p>
         </div>
         <div className="mt-6 md:mt-0">
-          <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl border border-white/30 text-center">
+          <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl border border-white/30 text-center min-w-[150px]">
             <p className="text-sm font-medium text-blue-100">Status Akun</p>
             <p className="text-xl font-bold flex items-center gap-2 justify-center">
-              <FaCheckCircle className="text-green-400" /> Aktif / Terverifikasi
+              <FaCheckCircle className="text-green-400" /> Aktif
             </p>
           </div>
         </div>
@@ -67,7 +111,6 @@ const DashboardUser = () => {
 
       {/* 2. MENU CEPAT (Quick Actions) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Card Ajukan Surat */}
         <Link to="/user/ajukan" className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition border hover:border-blue-500 cursor-pointer">
           <div className="flex items-center gap-4">
             <div className="p-4 bg-blue-100 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition">
@@ -75,13 +118,12 @@ const DashboardUser = () => {
             </div>
             <div>
               <h3 className="font-bold text-gray-800 text-lg">Ajukan Surat</h3>
-              <p className="text-gray-500 text-sm">Buat permohonan surat baru</p>
+              <p className="text-gray-500 text-sm">Buat permohonan baru</p>
             </div>
             <FaArrowRight className="ml-auto text-gray-300 group-hover:text-blue-500" />
           </div>
         </Link>
 
-        {/* Card Pengaduan */}
         <Link to="/user/pengaduan" className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition border hover:border-red-500 cursor-pointer">
           <div className="flex items-center gap-4">
             <div className="p-4 bg-red-100 text-red-600 rounded-lg group-hover:bg-red-600 group-hover:text-white transition">
@@ -89,14 +131,13 @@ const DashboardUser = () => {
             </div>
             <div>
               <h3 className="font-bold text-gray-800 text-lg">Lapor Masalah</h3>
-              <p className="text-gray-500 text-sm">Sampaikan keluhan Anda</p>
+              <p className="text-gray-500 text-sm">Sampaikan keluhan</p>
             </div>
             <FaArrowRight className="ml-auto text-gray-300 group-hover:text-red-500" />
           </div>
         </Link>
 
-        {/* Card Info */}
-        <div className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition border hover:border-green-500 cursor-pointer">
+        <Link to="/user/info" className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition border hover:border-green-500 cursor-pointer">
           <div className="flex items-center gap-4">
             <div className="p-4 bg-green-100 text-green-600 rounded-lg group-hover:bg-green-600 group-hover:text-white transition">
               <FaNewspaper size={24} />
@@ -107,70 +148,100 @@ const DashboardUser = () => {
             </div>
             <FaArrowRight className="ml-auto text-gray-300 group-hover:text-green-500" />
           </div>
-        </div>
+        </Link>
       </div>
 
-      {/* 3. RIWAYAT TERBARU (Modern List) */}
+      {/* 3. RIWAYAT AKTIVITAS (Timeline) */}
       <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-        <div className="p-6 border-b flex justify-between items-center bg-gray-50">
+        <div className="p-6 border-b bg-gray-50 flex justify-between items-center">
           <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
             <FaClock className="text-blue-500" /> Riwayat Aktivitas
           </h3>
-          <span className="text-xs font-medium text-gray-500 bg-white px-3 py-1 rounded-full border">
-            {riwayat.length} Permohonan
+          <span className="text-xs bg-white border px-3 py-1 rounded-full text-gray-500">
+            {riwayat.length} Total
           </span>
         </div>
 
         <div className="divide-y divide-gray-100">
           {isLoading ? (
-            <div className="p-8 text-center text-gray-500">Memuat data...</div>
+            <div className="p-10 text-center text-gray-500">Memuat data aktivitas...</div>
           ) : riwayat.length === 0 ? (
             <div className="p-12 text-center">
-              <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="Empty" className="w-24 mx-auto mb-4 opacity-50" />
-              <p className="text-gray-500 font-medium">Belum ada aktivitas.</p>
-              <Link to="/user/ajukan" className="text-blue-600 hover:underline text-sm mt-2 block">Mulai buat pengajuan</Link>
+              <p className="text-gray-400 mb-2 text-4xl">📭</p>
+              <p className="text-gray-500 font-medium">Belum ada aktivitas apapun.</p>
             </div>
           ) : (
             riwayat.map((item) => (
-              <div key={item.id} className="p-6 hover:bg-gray-50 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div key={`${item.tipe}-${item.id}`} className="p-6 hover:bg-gray-50 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
                 
-                {/* Kiri: Ikon & Detail */}
+                {/* BAGIAN KIRI: IKON & INFO */}
                 <div className="flex items-start gap-4">
-                  <div className={`p-3 rounded-full mt-1 ${
-                    item.status === 'selesai' ? 'bg-green-100 text-green-600' : 'bg-blue-50 text-blue-600'
+                  {/* Ikon sesuai tipe */}
+                  <div className={`p-3 rounded-full mt-1 shadow-sm ${
+                    item.tipe === 'surat' ? 'bg-blue-100 text-blue-600' : 'bg-red-100 text-red-600'
                   }`}>
-                    <FaFileAlt />
+                    {item.tipe === 'surat' ? <FaFileAlt /> : <FaBullhorn />}
                   </div>
-                  <div>
-                    <h4 className="font-bold text-gray-800">{item.nama_surat}</h4>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Diajukan pada: {new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-                    </p>
+
+                  <div className="flex-1">
+                    {/* Judul */}
+                    <h4 className="font-bold text-gray-800 text-lg">
+                      {item.tipe === 'surat' ? item.nama_surat : item.judul_laporan}
+                    </h4>
                     
-                    {/* Pesan Admin (Jika ada) */}
-                    {item.keterangan_admin && (
-                      <div className="mt-2 text-xs bg-gray-100 p-2 rounded text-gray-600 inline-block border">
-                        💬 Admin: {item.keterangan_admin}
+                    {/* Meta Data */}
+                    <div className="text-sm text-gray-500 mt-1 flex flex-wrap gap-3 items-center">
+                      <span className="flex items-center gap-1">
+                        <FaClock size={12} /> {new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </span>
+                      <span className="font-semibold text-gray-400 text-[10px] px-2 py-0.5 border rounded uppercase bg-gray-50">
+                        {item.tipe === 'surat' ? 'Layanan Surat' : 'Pengaduan'}
+                      </span>
+                    </div>
+
+                    {/* Feedback Admin (Kondisional) */}
+                    {item.tipe === 'surat' && item.keterangan_admin && (
+                      <div className="mt-2 text-sm text-yellow-700 bg-yellow-50 px-3 py-1 rounded border border-yellow-100 inline-block">
+                        📝 <b>Catatan Admin:</b> {item.keterangan_admin}
+                      </div>
+                    )}
+
+                    {item.tipe === 'aduan' && item.respon_admin && (
+                      <div className="mt-2 text-sm text-blue-700 bg-blue-50 px-3 py-2 rounded border border-blue-100 inline-block max-w-xl">
+                        💬 <b>Balasan Admin:</b> "{item.respon_admin.substring(0, 70)}{item.respon_admin.length > 70 ? '...' : ''}"
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Kanan: Status & Aksi */}
-                <div className="flex items-center gap-4 self-end md:self-center">
+                {/* BAGIAN KANAN: STATUS & TOMBOL AKSI */}
+                <div className="flex items-center gap-3 self-end md:self-center flex-wrap justify-end">
+                  
                   {getStatusBadge(item.status)}
                   
-                  {item.status === 'selesai' && item.file_hasil && (
+                  {/* Tombol Lihat Tanggapan (Khusus Pengaduan yg ada respon) */}
+                  {item.tipe === 'aduan' && item.respon_admin && (
+                    <button 
+                      onClick={() => showResponAdmin(item.respon_admin, item.judul_laporan)}
+                      className="flex items-center gap-2 text-white bg-blue-600 px-4 py-1.5 rounded-full text-xs font-bold hover:bg-blue-700 transition shadow-sm"
+                    >
+                      <FaCommentDots /> Lihat Tanggapan
+                    </button>
+                  )}
+
+                  {/* Tombol Download (Khusus Surat Selesai) */}
+                  {item.tipe === 'surat' && item.status === 'selesai' && item.file_hasil && (
                     <a 
                       href={`http://localhost:5000/${item.file_hasil}`} 
                       target="_blank" 
                       rel="noreferrer"
-                      className="text-blue-600 hover:text-blue-800 text-sm font-semibold border-b border-blue-200 hover:border-blue-600 transition"
+                      className="flex items-center gap-2 text-indigo-600 font-bold text-xs border border-indigo-200 px-3 py-1.5 rounded-full hover:bg-indigo-50 transition"
                     >
                       Download PDF
                     </a>
                   )}
                 </div>
+
               </div>
             ))
           )}
