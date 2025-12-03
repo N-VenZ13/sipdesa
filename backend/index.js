@@ -14,6 +14,7 @@ const informasiRoutes = require('./src/routes/informasiRoutes');
 const suratRoutes = require('./src/routes/suratRoutes');
 const pengaduanRoutes = require('./src/routes/pengaduanRoutes');
 const userRoutes = require('./src/routes/userRoutes');
+const dashboardRoutes = require('./src/routes/dashboardRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -36,6 +37,8 @@ app.use('/api/informasi', informasiRoutes);
 app.use('/api/surat', suratRoutes);
 app.use('/api/pengaduan', pengaduanRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+
 
 // Test Route
 app.get('/', (req, res) => {
