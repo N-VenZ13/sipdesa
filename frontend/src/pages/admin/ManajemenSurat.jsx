@@ -8,7 +8,8 @@ const ManajemenSurat = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedSurat, setSelectedSurat] = useState(null);
   
-  const BASE_URL = 'http://localhost:5000/';
+  // const BASE_URL = 'http://localhost:5000/';
+  const BASE_URL = import.meta.env.DEV ? 'http://localhost:5000' : '';
 
   // Ambil data saat halaman dibuka
   useEffect(() => {
@@ -70,6 +71,19 @@ const ManajemenSurat = () => {
       default: return 'bg-gray-500';
     }
   };
+
+  // --- FUNGSI HELPER URL FILE ---
+  const getFileUrl = (filePath) => {
+    if (!filePath) return '#';
+    // Bersihkan backslash (\) jadi slash (/) dan hapus slash di awal jika ada
+    const cleanPath = filePath.replace(/\\/g, '/').replace(/^\//, '');
+    
+    // Jika di Laptop (DEV), pakai localhost:5000. 
+    // Jika di Hosting (PROD), pakai '/' (Root Domain)
+    return import.meta.env.DEV 
+      ? `http://localhost:5000/${cleanPath}` 
+      : `/${cleanPath}`; 
+  }
 
   return (
     <div className="p-6">
@@ -157,7 +171,8 @@ const ManajemenSurat = () => {
                 <h4 className="font-bold text-sm mb-2 text-gray-700">Lampiran Persyaratan:</h4>
                 {selectedSurat.file_persyaratan ? (
                   <a 
-                    href={`${BASE_URL}${selectedSurat.file_persyaratan}`} 
+                    // href={`${BASE_URL}${selectedSurat.file_persyaratan}`} 
+                    href={getFileUrl(selectedSurat.file_persyaratan)} // Gunakan fungsi helper tadi
                     target="_blank" 
                     rel="noreferrer"
                     className="flex items-center gap-2 text-blue-600 hover:underline bg-blue-50 p-3 rounded border border-blue-100 w-fit"

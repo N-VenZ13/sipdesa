@@ -64,6 +64,14 @@ const DashboardUser = () => {
     });
   };
 
+  const getFileUrl = (filePath) => {
+  if (!filePath) return '#';
+  const cleanPath = filePath.replace(/\\/g, '/').replace(/^\//, '');
+  return import.meta.env.DEV 
+    ? `http://localhost:5000/${cleanPath}` 
+    : `/${cleanPath}`; 
+  };
+
   // --- HELPER WARNA STATUS ---
   const getStatusBadge = (status) => {
     const styles = {
@@ -232,7 +240,9 @@ const DashboardUser = () => {
                   {/* Tombol Download (Khusus Surat Selesai) */}
                   {item.tipe === 'surat' && item.status === 'selesai' && item.file_hasil && (
                     <a 
-                      href={`http://localhost:5000/${item.file_hasil}`} 
+                      // Hapus slash di depan item.file_hasil jika ada, biar aman
+                      // href={`${BASE_URL}/${item.file_hasil.replace(/^\//, '')}`}
+                      href={getFileUrl(item.file_hasil)} // Gunakan fungsi helper
                       target="_blank" 
                       rel="noreferrer"
                       className="flex items-center gap-2 text-indigo-600 font-bold text-xs border border-indigo-200 px-3 py-1.5 rounded-full hover:bg-indigo-50 transition"
