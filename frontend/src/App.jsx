@@ -15,6 +15,7 @@ import UserPengaduan from './pages/user/UserPengaduan';
 import AdminPengaduan from './pages/admin/AdminPengaduan';
 import ManajemenUser from './pages/admin/ManajemenUser';
 import InfoDesa from './pages/user/InfoDesa';
+import RegisterPage from './pages/auth/RegisterPage';
 
 
 
@@ -24,6 +25,7 @@ function App() {
       <Routes>
         {/* Route Public */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         
         {/* Route Khusus Admin (Protected) */}
         <Route path="/admin" element={<AdminLayout />}>

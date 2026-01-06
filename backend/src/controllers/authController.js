@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const db = require('../config/database'); 
 
 // 1. Logic REGISTER
 exports.register = async (req, res) => {
@@ -68,12 +69,52 @@ exports.login = async (req, res) => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                role_id: user.role_id
+                role_id: user.role_id,
+                nik: user.nik,          
+                phone: user.phone,      
+                address: user.address   
             }
         });
 
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Terjadi kesalahan server' });
+    }
+};
+
+exports.register = async (req, res) => {
+    const { nik, name, email, password, phone, address } = req.body;
+
+    try {
+        // Validasi input dasar
+        if (!nik || !name || !email || !password) {
+            return res.status(400).json({ message: 'NIK, Nama, Email, dan Password wajib diisi!' });
+        }
+
+        // Cek apakah Email ATAU NIK sudah terdaftar
+        const [existingUser] = await db.query(
+            'SELECT * FROM users WHERE email = ? OR nik = ?', 
+            [email, nik]
+        );
+
+        if (existingUser.length > 0) {
+            return res.status(400).json({ message: 'Email atau NIK sudah terdaftar!' });
+        }
+
+        // Hash Password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // Simpan ke database (Default role_id = 2 untuk Warga)
+        await db.query(
+            'INSERT INTO users (role_id, nik, name, email, password, phone, address) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [2, nik, name, email, hashedPassword, phone || null, address || null]
+        );
+
+        res.status(201).json({ message: 'Registrasi berhasil! Silakan login.' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Terjadi kesalahan server', error: error.message });
     }
 };

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { loginSuccess } from '../../redux/authSlice';
 import Swal from 'sweetalert2';
+import { Link } from 'react-router-dom';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -89,9 +90,9 @@ const LoginPage = () => {
           </button>
         </form>
 
-        {/* <p className="mt-4 text-center text-sm text-gray-600">
-          Belum punya akun? <span className="text-blue-500 cursor-pointer font-bold">Daftar disini</span>
-        </p> */}
+        <p className="mt-4 text-center text-sm text-gray-600">
+  Belum punya akun? <Link to="/register" className="text-blue-500 cursor-pointer font-bold hover:underline">Daftar disini</Link>
+</p>
       </div>
     </div>
   );
